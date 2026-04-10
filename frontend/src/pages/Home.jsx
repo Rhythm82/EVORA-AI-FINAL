@@ -87,14 +87,10 @@ const Home = () => {
         <div className="absolute w-96 h-96 bg-indigo-400 rounded-full blur-3xl opacity-30 bottom-10 right-10"></div>
 
         <div className="relative text-center text-white max-w-2xl px-6">
-          
-          
           <h1 className="evora-title text-9xl font-bold tracking-wide mb-6 relative">
-            
             EVORA AI
-            
           </h1>
-          
+
           <div className="absolute top-40 left-1/3 w-40 h-40 bg-purple-400/30 blur-3xl rounded-full animate-pulse"></div>
           <div className="absolute top-60 right-1/3 w-32 h-32 bg-indigo-400/30 blur-3xl rounded-full animate-pulse"></div>
 
@@ -163,7 +159,6 @@ const Home = () => {
               automation tools.
             </p>
           </div>
-          
 
           <div className="bg-white p-8 rounded-xl shadow">
             <h3 className="text-xl font-semibold mb-3">AI Marketing</h3>

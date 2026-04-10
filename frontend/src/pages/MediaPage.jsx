@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { FaMicrophone, FaCopy } from "react-icons/fa";
+import api from "../lib/api";
 export default function MediaPage() {
   const { id } = useParams();
 
@@ -42,20 +43,16 @@ export default function MediaPage() {
   const generateContent = async () => {
     setLoading(true);
 
-    const res = await fetch("http://localhost:5000/api/ai/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    try {
+      const res = await api.post("/ai/generate", {
         eventId: id,
         prompt: idea,
-      }),
-    });
+      });
 
-    const data = await res.json();
-
-    setResult(data);
+      setResult(res.data);
+    } catch (err) {
+      console.error(err);
+    }
 
     setLoading(false);
 
@@ -142,150 +139,107 @@ export default function MediaPage() {
       {/* RESULT SECTION */}
 
       {result && (
-  <div ref={resultRef} className="mt-20 mb-20 space-y-16">
+        <div ref={resultRef} className="mt-20 mb-20 space-y-16">
+          {/* GENERATED POSTS */}
 
-    {/* GENERATED POSTS */}
+          <section>
+            <h2 className="text-2xl font-bold mb-8 text-gray-800 flex items-center gap-3">
+              <span className="w-2 h-8 bg-gradient-to-b from-purple-500 to-indigo-500 rounded"></span>
+              Generated Social Posts
+            </h2>
 
-    <section>
+            <div className="grid md:grid-cols-3 gap-8">
+              {result.posts?.map((post, i) => (
+                <div
+                  key={i}
+                  className="group relative backdrop-blur-xl bg-white/30 border border-purple-200/40 rounded-2xl p-6 shadow-xl hover:shadow-purple-400/40 hover:-translate-y-2 transition-all duration-300"
+                >
+                  {/* glow overlay */}
 
-      <h2 className="text-2xl font-bold mb-8 text-gray-800 flex items-center gap-3">
-        <span className="w-2 h-8 bg-gradient-to-b from-purple-500 to-indigo-500 rounded"></span>
-        Generated Social Posts
-      </h2>
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-400/10 to-indigo-400/10 opacity-0 group-hover:opacity-100 transition"></div>
 
-      <div className="grid md:grid-cols-3 gap-8">
+                  <p className="text-gray-800 leading-relaxed relative">
+                    {post}
+                  </p>
 
-        {result.posts?.map((post, i) => (
-
-          <div
-            key={i}
-            className="group relative backdrop-blur-xl bg-white/30 border border-purple-200/40 rounded-2xl p-6 shadow-xl hover:shadow-purple-400/40 hover:-translate-y-2 transition-all duration-300"
-          >
-
-            {/* glow overlay */}
-
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-400/10 to-indigo-400/10 opacity-0 group-hover:opacity-100 transition"></div>
-
-            <p className="text-gray-800 leading-relaxed relative">
-              {post}
-            </p>
-
-            <button
-              onClick={() => copyText(post)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-purple-600 transition"
-            >
-              <FaCopy />
-            </button>
-
-          </div>
-
-        ))}
-
-      </div>
-
-    </section>
-
-
-    {/* CAMPAIGN STRATEGY */}
-
-    <section>
-
-      <h2 className="text-2xl font-bold mb-8 text-gray-800 flex items-center gap-3">
-        <span className="w-2 h-8 bg-gradient-to-b from-purple-500 to-indigo-500 rounded"></span>
-        Campaign Strategy
-      </h2>
-
-      <div className="grid md:grid-cols-3 gap-8">
-
-        {result.campaign_series?.map((item, i) => (
-
-          <div
-            key={i}
-            className="backdrop-blur-xl bg-white/30 border border-purple-200/40 rounded-2xl p-6 shadow-xl hover:shadow-purple-300/40 hover:-translate-y-2 transition-all duration-300"
-          >
-
-            <p className="text-gray-800 leading-relaxed">
-              {item}
-            </p>
-
-          </div>
-
-        ))}
-
-      </div>
-
-    </section>
-
-
-    {/* BEST POSTING TIME */}
-
-    <section>
-
-      <h2 className="text-2xl font-bold mb-8 text-gray-800 flex items-center gap-3">
-        <span className="w-2 h-8 bg-gradient-to-b from-purple-500 to-indigo-500 rounded"></span>
-        Best Posting Time
-      </h2>
-
-      <div className="grid md:grid-cols-3 gap-8">
-
-        {Object.entries(result.best_posting_time || {}).map(
-          ([platform, time]) => (
-
-            <div
-              key={platform}
-              className="backdrop-blur-xl bg-white/30 border border-purple-200/40 rounded-2xl p-6 shadow-xl hover:shadow-purple-300/40 hover:-translate-y-2 transition-all duration-300"
-            >
-
-              <h3 className="font-semibold text-purple-700 capitalize text-lg mb-2">
-                {platform}
-              </h3>
-
-              <p className="text-gray-700">
-                {time}
-              </p>
-
+                  <button
+                    onClick={() => copyText(post)}
+                    className="absolute top-4 right-4 text-gray-400 hover:text-purple-600 transition"
+                  >
+                    <FaCopy />
+                  </button>
+                </div>
+              ))}
             </div>
+          </section>
 
-          )
-        )}
+          {/* CAMPAIGN STRATEGY */}
 
-      </div>
+          <section>
+            <h2 className="text-2xl font-bold mb-8 text-gray-800 flex items-center gap-3">
+              <span className="w-2 h-8 bg-gradient-to-b from-purple-500 to-indigo-500 rounded"></span>
+              Campaign Strategy
+            </h2>
 
-    </section>
+            <div className="grid md:grid-cols-3 gap-8">
+              {result.campaign_series?.map((item, i) => (
+                <div
+                  key={i}
+                  className="backdrop-blur-xl bg-white/30 border border-purple-200/40 rounded-2xl p-6 shadow-xl hover:shadow-purple-300/40 hover:-translate-y-2 transition-all duration-300"
+                >
+                  <p className="text-gray-800 leading-relaxed">{item}</p>
+                </div>
+              ))}
+            </div>
+          </section>
 
+          {/* BEST POSTING TIME */}
 
-    {/* CONTENT SCHEDULE */}
+          <section>
+            <h2 className="text-2xl font-bold mb-8 text-gray-800 flex items-center gap-3">
+              <span className="w-2 h-8 bg-gradient-to-b from-purple-500 to-indigo-500 rounded"></span>
+              Best Posting Time
+            </h2>
 
-    <section>
+            <div className="grid md:grid-cols-3 gap-8">
+              {Object.entries(result.best_posting_time || {}).map(
+                ([platform, time]) => (
+                  <div
+                    key={platform}
+                    className="backdrop-blur-xl bg-white/30 border border-purple-200/40 rounded-2xl p-6 shadow-xl hover:shadow-purple-300/40 hover:-translate-y-2 transition-all duration-300"
+                  >
+                    <h3 className="font-semibold text-purple-700 capitalize text-lg mb-2">
+                      {platform}
+                    </h3>
 
-      <h2 className="text-2xl font-bold mb-8 text-gray-800 flex items-center gap-3">
-        <span className="w-2 h-8 bg-gradient-to-b from-purple-500 to-indigo-500 rounded"></span>
-        Content Schedule
-      </h2>
+                    <p className="text-gray-700">{time}</p>
+                  </div>
+                ),
+              )}
+            </div>
+          </section>
 
-      <div className="grid md:grid-cols-3 gap-8">
+          {/* CONTENT SCHEDULE */}
 
-        {result.content_queue?.map((item, i) => (
+          <section>
+            <h2 className="text-2xl font-bold mb-8 text-gray-800 flex items-center gap-3">
+              <span className="w-2 h-8 bg-gradient-to-b from-purple-500 to-indigo-500 rounded"></span>
+              Content Schedule
+            </h2>
 
-          <div
-            key={i}
-            className="backdrop-blur-xl bg-white/30 border border-purple-200/40 rounded-2xl p-6 shadow-xl hover:shadow-purple-300/40 hover:-translate-y-2 transition-all duration-300"
-          >
-
-            <p className="text-gray-800 leading-relaxed">
-              {item}
-            </p>
-
-          </div>
-
-        ))}
-
-      </div>
-
-    </section>
-
-  </div>
-)}
+            <div className="grid md:grid-cols-3 gap-8">
+              {result.content_queue?.map((item, i) => (
+                <div
+                  key={i}
+                  className="backdrop-blur-xl bg-white/30 border border-purple-200/40 rounded-2xl p-6 shadow-xl hover:shadow-purple-300/40 hover:-translate-y-2 transition-all duration-300"
+                >
+                  <p className="text-gray-800 leading-relaxed">{item}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 }
