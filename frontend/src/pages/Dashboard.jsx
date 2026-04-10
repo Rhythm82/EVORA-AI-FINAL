@@ -87,12 +87,12 @@ export default function Dashboard() {
             Dashboard
           </a>
 
-          <a
-            href="/listings"
+          <Link
+            to="/listings"
             className="px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 transition font-medium"
           >
             My Listings
-          </a>
+          </Link>
 
           <Link
             to="/evaluation"
